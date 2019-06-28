@@ -7,7 +7,11 @@ from django.contrib.auth.forms import UserCreationForm
 def create_user(request):
     if request.method == "POST":
         # 회원가입
-        pass
+        form = UserCreationForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+
     else:
         # 회원가입 form 제공
         form = UserCreationForm()
