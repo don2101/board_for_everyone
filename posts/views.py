@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Posts
+from .forms import PostsModelForm
 
 # Create your views here.
 def main_page(request):
@@ -10,4 +11,17 @@ def main_page(request):
 
 
 def create_post(request):
-    pass
+    if request.method == "POST":
+        form = PostsModelForm(request.POST)
+
+        if form.is_valid():
+            created_post = form.save(commit=False)
+            created_post.writer = request.user
+            create_post.save()
+            
+            return redirect('posts:main')
+    else:
+        # modelform 제공
+        form = PostsModelForm()
+        
+        return render(request, 'posts/post.html', {'form': form})
