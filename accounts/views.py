@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 
+from django.conf import settings
+
 # Create your views here.
 
 # 회원가입 기능
@@ -45,4 +47,8 @@ def sign_out(request):
 
 
 def mypage(request, user_name):
-    pass
+    # user가 작성한 모든 post 출력
+    posts = request.user.posts_set.all()
+    
+    return render(request, 'accounts/mypage.html', {'posts': posts})
+    
