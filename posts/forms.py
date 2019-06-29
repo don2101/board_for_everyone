@@ -9,11 +9,15 @@ class PostsModelForm(forms.ModelForm):
 
         widgets = {
             'title': forms.TextInput(
-
+                attrs={
+                    'class': 'form-control',
+                }
             ),
 
             'content': forms.Textarea(
-
+                attrs={
+                    'class': 'form-control',
+                }
             ),
         }
 
