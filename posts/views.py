@@ -1,3 +1,27 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from .models import Posts
+from .forms import PostsModelForm
 
 # Create your views here.
+def main_page(request):
+    # 모든 posts 출력
+    posts = Posts.objects.all()
+
+    return render(request, 'posts/main.html', {'posts': posts})
+
+
+def create_post(request):
+    if request.method == "POST":
+        form = PostsModelForm(request.POST)
+
+        if form.is_valid():
+            created_post = form.save(commit=False)
+            created_post.writer = request.user
+            created_post.save()
+            
+            return redirect('posts:main')
+    else:
+        # modelform 제공
+        form = PostsModelForm()
+        
+        return render(request, 'posts/post.html', {'form': form})

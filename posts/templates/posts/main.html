@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %}board for everyone! - 당신의 현재를 기록하세요{% endblock %}
+
+{% block body %}
+<h1>board!</h1>
+    {% for post in posts %}
+        {{ posts }}
+    {% endfor %}
+{% endblock %}
