@@ -7,3 +7,7 @@ def main_page(request):
     posts = Posts.objects.all()
 
     return render(request, 'posts/main.html', {'posts': posts})
+
+
+def create_post(request):
+    pass
