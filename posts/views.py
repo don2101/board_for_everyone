@@ -17,7 +17,7 @@ def create_post(request):
         if form.is_valid():
             created_post = form.save(commit=False)
             created_post.writer = request.user
-            create_post.save()
+            created_post.save()
             
             return redirect('posts:main')
     else:
