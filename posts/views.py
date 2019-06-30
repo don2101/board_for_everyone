@@ -12,16 +12,16 @@ def main_page(request):
 
 def create_post(request):
     if request.method == "POST":
-        form = PostsModelForm(request.POST)
+        forms = PostsModelForm(request.POST)
 
-        if form.is_valid():
-            created_post = form.save(commit=False)
+        if forms.is_valid():
+            created_post = forms.save(commit=False)
             created_post.writer = request.user
             created_post.save()
             
             return redirect('posts:main')
     else:
         # modelform 제공
-        form = PostsModelForm()
+        forms = PostsModelForm()
         
-        return render(request, 'posts/post.html', {'form': form})
+        return render(request, 'posts/post.html', {'forms': forms})
