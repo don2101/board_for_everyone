@@ -10,34 +10,34 @@ from django.conf import settings
 def create_user(request):
     if request.method == "POST":
         # 회원가입
-        form = UserCreationForm(request.POST)
+        forms = UserCreationForm(request.POST)
 
-        if form.is_valid():
-            form.save()
+        if forms.is_valid():
+            forms.save()
 
     else:
         # 회원가입 form 제공
-        form = UserCreationForm()
+        forms = UserCreationForm()
 
-        return render(request, 'accounts/sign_up.html', {'form': form})
+        return render(request, 'accounts/sign_up.html', {'forms': forms})
 
 
 def sign_in(request):
     if request.method == "POST":
         # login 시키고 main페이지로
-        form = AuthenticationForm(request, request.POST)
+        forms = AuthenticationForm(request, request.POST)
 
-        if form.is_valid():
-            login_user = form.get_user()
+        if forms.is_valid():
+            login_user = forms.get_user()
             login(request, login_user)
 
             return redirect('posts:main')
 
     else:
         # login form 제공
-        form = AuthenticationForm(request)
+        forms = AuthenticationForm(request)
         
-        return render(request, 'accounts/sign_in.html', {'form': form})
+        return render(request, 'accounts/sign_in.html', {'forms': forms})
 
 
 def sign_out(request):

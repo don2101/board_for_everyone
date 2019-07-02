@@ -3,9 +3,16 @@
 {% block title %} 로그인 {% endblock %}
 
 {% block body %}
-    <form action="", method="POST">
-        {% csrf_token %}
-        {{form}}
-        <button type="submit">로그인</button>
-    </form>
+    <div class="row">
+        <form action="" method="POST">
+            {% csrf_token %}
+            
+            {% for form in forms %}
+                {{ form.label_tag }}
+                {{ form }}
+            {% endfor %}
+
+            <button class="btn btn-primary" type="submit">로그인</button>
+        </form>
+    </div>
 {% endblock %}
