@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+# from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .forms import UserCreationModelForm, UserLoginForm
 from django.contrib.auth import login, logout
 
 from django.conf import settings
@@ -10,14 +11,14 @@ from django.conf import settings
 def create_user(request):
     if request.method == "POST":
         # 회원가입
-        forms = UserCreationForm(request.POST)
+        forms = UserCreationModelForm(request.POST)
 
         if forms.is_valid():
             forms.save()
 
     else:
         # 회원가입 form 제공
-        forms = UserCreationForm()
+        forms = UserCreationModelForm()
 
         return render(request, 'accounts/sign_up.html', {'forms': forms})
 
@@ -25,7 +26,7 @@ def create_user(request):
 def sign_in(request):
     if request.method == "POST":
         # login 시키고 main페이지로
-        forms = AuthenticationForm(request, request.POST)
+        forms = UserLoginForm(request, request.POST)
 
         if forms.is_valid():
             login_user = forms.get_user()
@@ -35,8 +36,8 @@ def sign_in(request):
 
     else:
         # login form 제공
-        forms = AuthenticationForm(request)
-        
+        forms = UserLoginForm(request)
+
         return render(request, 'accounts/sign_in.html', {'forms': forms})
 
 
