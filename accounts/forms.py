@@ -28,7 +28,7 @@ class UserCreationModelForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         
         # update할 fileds에 접근하기 위한 임시 이름 지정
-        update_fields = ['password1', 'password2', 'username']
+        update_fields = ['username', 'password1', 'password2',]
         for field_name in update_fields:
             self.fields[field_name].widget.attrs.update({
                 'class': 'form-control'
@@ -36,4 +36,4 @@ class UserCreationModelForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['password1', 'password2', 'username']
+        fields = ['username', 'password1', 'password2',]
