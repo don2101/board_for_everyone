@@ -5,9 +5,18 @@
 
 
 {% block body %}
-    <form action="", method="POST">
-        {% csrf_token %}
-        {{ form }}
-        <button type=submit>글쓰기</button>
-    </form>
+    <div class="row mt-4">
+        <div class="col-8 offset-2">
+            <form action="", method="POST">
+                {% csrf_token %}
+                {% for form in forms %}
+                    <div class="mt-4">
+                        {{ form.label_tag }}
+                        {{ form }}
+                    </div>
+                {% endfor %}
+                <button class="btn btn-primary mt-3 float-right">글쓰기</button>
+            </form>
+        </div>
+    </div>
 {% endblock %}

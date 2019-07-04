@@ -3,8 +3,17 @@
 {% block title %}board for everyone! - 당신의 현재를 기록하세요{% endblock %}
 
 {% block body %}
-<h1>board!</h1>
+
+<div class="card-columns mt-5">
     {% for post in posts %}
-        {{ posts }}
+        <div class="card">
+            <div class="card-body">
+            <h4 class="card-title">{{ post.title }}</h4>
+            <h6 class="card-subtitle mb-2 text-muted">{{ post.writer }}</h6>
+            <p class="card-text">{{ post.content }}</p>
+            </div>
+        </div>
     {% endfor %}
+</div>
+
 {% endblock %}
