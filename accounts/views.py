@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 # from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import UserCreationModelForm, UserLoginForm
 from django.contrib.auth import login, logout
+from django.contrib import messages
 
 from django.conf import settings
 
@@ -15,7 +16,9 @@ def create_user(request):
 
         if forms.is_valid():
             forms.save()
+            messages.success(request, "가입 되었습니다.")
 
+            return redirect('accounts:signin')
     else:
         # 회원가입 form 제공
         forms = UserCreationModelForm()
@@ -31,7 +34,9 @@ def sign_in(request):
         if forms.is_valid():
             login_user = forms.get_user()
             login(request, login_user)
-
+            
+            messages.success(request, "로그인 됐습니다")
+            
             return redirect('posts:main')
 
     else:
@@ -43,6 +48,7 @@ def sign_in(request):
 
 def sign_out(request):
     logout(request)
+    messages.info(request, "로그아웃 됐습니다")
 
     return redirect('posts:main')
 
