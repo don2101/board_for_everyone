@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import models
 from .models import Posts
 from .forms import PostsModelForm
 
@@ -22,13 +23,17 @@ def main_page(request):
 def create_post(request):
     if request.method == "POST":
         serializer = PostsSerializer(data=request.data, partial=True)
-        
-        if serializer.is_valid():
-            serializer.save(writer=request.user)
-            
-            return Response(status=status.HTTP_201_CREATED)
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        if request.user.is_authenticated:
+            if serializer.is_valid():
+                serializer.save(writer=request.user)
+                
+                return Response(status=status.HTTP_201_CREATED)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
     else:
         # modelform 제공
 
