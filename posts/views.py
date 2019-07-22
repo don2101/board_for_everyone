@@ -39,13 +39,11 @@ def post(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 def post_deatil(request, post_id):
     if request.method == "GET":
-        post = Posts.objects.get(pk=post_id)
+        post = get_object_or_404(Posts, id=post_id)
 
-        if post:
-            serializer = PostsSerializer(post)
+        serializer = PostsSerializer(post)
 
-            return Response(serializer.data)
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.data)
 
     elif request.method == "PUT":
         post = Posts.objects.get(pk=post_id)
