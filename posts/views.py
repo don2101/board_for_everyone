@@ -40,19 +40,19 @@ def post(request):
 def post_deatil(request, post_id):
     if request.method == "GET":
         post = get_object_or_404(Posts, id=post_id)
-
+        print(post.writer)
         serializer = PostsSerializer(post)
 
         return Response(serializer.data)
 
     elif request.method == "PUT":
-        post = Posts.objects.get(pk=post_id)
+        post = get_object_or_404(Posts, id=post_id)
         
         if request.user == post.writer:
-            serializer = PostsSerializer(data=request.data, partial=True)
+            serializer = PostsSerializer(post, data=request.data, partial=True)
 
             if serializer.is_valid():
-                serializer.save()
+                serializer.save(writer=request.user)
 
                 return Response(status=status.HTTP_200_OK)
             else:
@@ -62,9 +62,9 @@ def post_deatil(request, post_id):
 
     else:
         post = Posts.objects.get(pk=post_id)
-        
+
         if request.user == post.writer:
-            post.remove()
+            post.delete()
 
             return Response(status=status.HTTP_202_ACCEPTED)
         
