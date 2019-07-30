@@ -3,6 +3,8 @@ from .models import Posts
 
 
 class PostsSerializer(serializers.ModelSerializer):
+    writer = serializers.StringRelatedField()
+
     class Meta:
         model = Posts
         fields = ['writer', 'title', 'content', 'created_at', 'updated_at']
