@@ -1,6 +1,12 @@
 from django.shortcuts import render, redirect
 # from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import UserCreationModelForm, UserLoginForm
+from .serializers import UserSerializer
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+
 from django.contrib.auth import login, logout
 from django.contrib import messages
 
@@ -9,21 +15,17 @@ from django.conf import settings
 # Create your views here.
 
 # 회원가입 기능
+@api_view(['POST'])
 def create_user(request):
-    if request.method == "POST":
-        # 회원가입
-        forms = UserCreationModelForm(request.POST)
+    # 회원가입
+    serializer = UserSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        serializer.save()
 
-        if forms.is_valid():
-            forms.save()
-            messages.success(request, "가입 되었습니다.")
-
-            return redirect('accounts:signin')
-    else:
-        # 회원가입 form 제공
-        forms = UserCreationModelForm()
-
-        return render(request, 'accounts/sign_up.html', {'forms': forms})
+        return Response(status=status.HTTP_201_CREATED)
+    
+    return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 def sign_in(request):
