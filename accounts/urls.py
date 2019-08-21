@@ -6,7 +6,7 @@ app_name = "accounts"
 
 urlpatterns = [
     path('signup/', views.create_user, name="signup"),
-    path('signin/', views.sign_in, name="signin"),
+    path('signin/', views.LoginView.as_view(), name="signin"),
     path('signout/', views.sign_out, name="signout"),
     path('token/', obtain_jwt_token, name="token_obtain"),
     path('token/verify/', verify_jwt_token, name="token_verity"),
