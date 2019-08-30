@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 # from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import UserCreationModelForm, UserLoginForm
-from .serializers import UserSerializer, CustomJWTSerializer
+from .serializers import UserSerializer
 
+import datetime
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -32,6 +33,7 @@ def create_user(request):
     
     return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
 
+
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
         username = request.data['username']
@@ -41,28 +43,19 @@ class LoginView(APIView):
             user = authenticate(username=username, password=password)
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        print(user)
 
         if user:
 
             payload = {
                 'id': user.id,
-                'email': user.email
+                'email': user.email,
+                'exp': datetime.datetime.now() + datetime.timedelta(seconds=10)
             }
 
-            jwt_token = { 'token': jwt.encode(payload, "SECRET_KEY") }
-            print(jwt_token)
+            jwt_token = jwt.encode(payload, "secret", algorithm="HS256")
+
             return Response(jwt_token, status=status.HTTP_200_OK)
             
-
-
-@api_view(['POST'])
-def sign_in(request):
-    serializer = CustomJWTSerializer(request.data)
-
-    if serializer.is_valid():
-        serializer.save()
-    
 
 def sign_out(request):
     logout(request)
