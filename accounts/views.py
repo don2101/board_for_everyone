@@ -39,10 +39,8 @@ class LoginView(APIView):
         username = request.data['username']
         password = request.data['password']
         
-        try:
-            user = authenticate(username=username, password=password)
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        user = authenticate(username=username, password=password)
 
         if user:
 
@@ -51,10 +49,14 @@ class LoginView(APIView):
                 'email': user.email,
                 'exp': datetime.datetime.now() + datetime.timedelta(seconds=10)
             }
-
+            
             jwt_token = jwt.encode(payload, "secret", algorithm="HS256")
+            
+            login(request, user)
 
             return Response(jwt_token, status=status.HTTP_200_OK)
+
+        else: return Response(status=status.HTTP_400_BAD_REQUEST)
             
 
 def sign_out(request):
