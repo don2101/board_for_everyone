@@ -35,36 +35,39 @@ def create_user(request):
 
 
 class LoginView(APIView):
-    def post(self, request, *args, **kwargs):
+    def post(self, request, format=None):
         username = request.data['username']
         password = request.data['password']
-        
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(request, username=username, password=password)
 
         if user:
 
             payload = {
                 'id': user.id,
+                'nickname': user.username,
                 'email': user.email,
-                'exp': datetime.datetime.now() + datetime.timedelta(seconds=10)
+                'exp': datetime.datetime.now() + datetime.timedelta(seconds=100)
             }
             
             jwt_token = jwt.encode(payload, "secret", algorithm="HS256")
             
-            login(request, user)
-
             return Response(jwt_token, status=status.HTTP_200_OK)
 
         else: return Response(status=status.HTTP_400_BAD_REQUEST)
-            
-
-def sign_out(request):
-    logout(request)
-
-    return redirect('posts:main')
 
 
+@api_view(['POST'])
+def logout(request):
+    try:
+        token = request.data['token']
+        result = jwt.decode(token, "secret", algorithms="HS256")
+        
+        return Response(status=status.HTTP_200_OK)
+    except jwt.ExpiredSignatureError:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        
 def mypage(request, user_name):
     # user가 작성한 모든 post 출력
     posts = request.user.posts_set.all()
