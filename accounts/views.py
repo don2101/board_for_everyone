@@ -1,18 +1,20 @@
 from django.shortcuts import render, redirect
-# from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .serializers import UserSerializer
-
 import datetime
 
+# module for rest_framework
+from .serializers import UserSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 
-import jwt
+# module for User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model, authenticate
-from django.conf import settings
+
+# module for jwt
+from simple_board import jwt_parser
+
 
 # Create your views here.
 
@@ -49,7 +51,7 @@ def login(request):
             'exp': datetime.datetime.now() + datetime.timedelta(seconds=100)
         }
         
-        jwt_token = jwt.encode(payload, "secret", algorithm="HS256")
+        jwt_token = jwt_parser.encode(payload)
         
         return Response(jwt_token, status=status.HTTP_200_OK)
 
@@ -58,12 +60,12 @@ def login(request):
 
 @api_view(['POST'])
 def logout(request):
-    try:
-        token = request.data['token']
-        result = jwt.decode(token, "secret", algorithms="HS256")
-        
+    token = request.data['token']
+    result = jwt_parser.decode(token)
+    
+    if result: 
         return Response(status=status.HTTP_200_OK)
-    except jwt.ExpiredSignatureError:
+    else: 
         return Response(status=status.HTTP_400_BAD_REQUEST)
         
         
