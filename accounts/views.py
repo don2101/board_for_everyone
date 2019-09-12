@@ -1,58 +1,72 @@
 from django.shortcuts import render, redirect
 # from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .forms import UserCreationModelForm, UserLoginForm
-from django.contrib.auth import login, logout
-from django.contrib import messages
+from .serializers import UserSerializer
 
+import datetime
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+
+import jwt
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import get_user_model, authenticate
 from django.conf import settings
 
 # Create your views here.
 
+User = get_user_model()
+
 # 회원가입 기능
+@api_view(['POST'])
 def create_user(request):
-    if request.method == "POST":
-        # 회원가입
-        forms = UserCreationModelForm(request.POST)
+    # 회원가입
+    request.data['password'] = make_password(request.data.get('password'))
+    serializer = UserSerializer(data=request.data)
 
-        if forms.is_valid():
-            forms.save()
-            messages.success(request, "가입 되었습니다.")
-
-            return redirect('accounts:signin')
-    else:
-        # 회원가입 form 제공
-        forms = UserCreationModelForm()
-
-        return render(request, 'accounts/sign_up.html', {'forms': forms})
+    if serializer.is_valid():
+        
+        serializer.save()
+        return Response(status=status.HTTP_201_CREATED)
+    
+    return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
-def sign_in(request):
-    if request.method == "POST":
-        # login 시키고 main페이지로
-        forms = UserLoginForm(request, request.POST)
+@api_view(['POST'])
+def login(request):
+    username = request.data['username']
+    password = request.data['password']
 
-        if forms.is_valid():
-            login_user = forms.get_user()
-            login(request, login_user)
-            
-            messages.success(request, "로그인 됐습니다")
-            
-            return redirect('posts:main')
+    user = authenticate(request, username=username, password=password)
 
-    else:
-        # login form 제공
-        forms = UserLoginForm(request)
+    if user:
 
-        return render(request, 'accounts/sign_in.html', {'forms': forms})
+        payload = {
+            'id': user.id,
+            'nickname': user.username,
+            'email': user.email,
+            'exp': datetime.datetime.now() + datetime.timedelta(seconds=100)
+        }
+        
+        jwt_token = jwt.encode(payload, "secret", algorithm="HS256")
+        
+        return Response(jwt_token, status=status.HTTP_200_OK)
 
-
-def sign_out(request):
-    logout(request)
-    messages.info(request, "로그아웃 됐습니다")
-
-    return redirect('posts:main')
+    else: return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['POST'])
+def logout(request):
+    try:
+        token = request.data['token']
+        result = jwt.decode(token, "secret", algorithms="HS256")
+        
+        return Response(status=status.HTTP_200_OK)
+    except jwt.ExpiredSignatureError:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        
 def mypage(request, user_name):
     # user가 작성한 모든 post 출력
     posts = request.user.posts_set.all()

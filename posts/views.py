@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework import status
 
 from .models import Posts
@@ -12,40 +13,35 @@ from .serializers import PostsSerializer
 
 
 # Create your views here.
-@api_view(['GET'])
-def main_page(request):
-    # 모든 posts 출력
-    posts = Posts.objects.all()
-    serializer = PostsSerializer(posts, many=True)
+class PostView(APIView):
+    def get(self, request, format=None):
+        posts = Posts.objects.all()
+        serializer = PostsSerializer(posts, many=True)
 
-    return Response(serializer.data)
+        return Response(serializer.data)
 
-
-@api_view(['POST'])
-def post(request):
-    if request.user.is_authenticated:
-        serializer = PostsSerializer(data=request.data, partial=True)
+    def post(self, request, format=None):
+        if request.user.is_authenticated:
+            serializer = PostsSerializer(data=request.data, partial=True)
         
-        if serializer.is_valid():
-            serializer.save(writer=request.user)
-            
-            return Response(status=status.HTTP_201_CREATED)
+            if serializer.is_valid():
+                serializer.save(writer=request.user)
+                
+                return Response(status=status.HTTP_201_CREATED)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def post_deatil(request, post_id):
-    if request.method == "GET":
+class PostDetailView(APIView):
+    def get(self, request, post_id, format=None):
         post = get_object_or_404(Posts, id=post_id)
-        print(post.writer)
         serializer = PostsSerializer(post)
 
         return Response(serializer.data)
 
-    elif request.method == "PUT":
+    def put(self, request, post_id, format=None):
         post = get_object_or_404(Posts, id=post_id)
         
         if request.user == post.writer:
@@ -60,7 +56,7 @@ def post_deatil(request, post_id):
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    else:
+    def delete(self, request, post_id, format=None):
         post = Posts.objects.get(pk=post_id)
 
         if request.user == post.writer:
