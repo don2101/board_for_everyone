@@ -10,6 +10,8 @@ from rest_framework import status
 from .models import Posts
 from .forms import PostsModelForm
 from .serializers import PostsSerializer
+from simple_board import jwt_parser
+from django.contrib.auth import get_user_model
 
 
 # Create your views here.
@@ -21,11 +23,13 @@ class PostView(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        if request.user.is_authenticated:
+        if is_authenticated(request.data["token"]):
+            token = jwt_decode(request.data["token"])
             serializer = PostsSerializer(data=request.data, partial=True)
-        
+            
             if serializer.is_valid():
-                serializer.save(writer=request.user)
+                writer = get_user(token['id'])
+                serializer.save(writer=writer)
                 
                 return Response(status=status.HTTP_201_CREATED)
             else:
@@ -67,3 +71,21 @@ class PostDetailView(APIView):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
+
+def is_authenticated(token):
+    result = jwt_decode(token)
+
+    if result: return True
+    else: return False
+
+
+def jwt_decode(token):
+    result = jwt_parser.decode(token)
+    
+    return result
+
+
+def get_user(pk):
+    User = get_user_model()
+
+    return User.objects.get(pk=pk)

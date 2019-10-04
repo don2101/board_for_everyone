@@ -17,15 +17,13 @@ class FunctionTest(TestCase):
             "content": "contentwefewf",
         }
 
-    def test_login(self):
         result = requests.post(self.LOGIN_URL, data=self.login_data)
-
-        self.post_body["jwt"] = result.text
-        self.assertEqual(result, result)
+        
+        self.post_body["token"] = result.text[1:len(result.text)-1]
 
     def test_post(self):
         result = requests.post(self.POST_URL, data=self.post_body)
 
-        print(result)
-        self.assertEqual(result, result)
+        print(result.status_code)
+        self.assertEqual(result.status_code, 200)
 
