@@ -1,6 +1,8 @@
 import jwt
 from . import settings
+import datetime
 
+second_delta = 10000
 
 def encode(payload):
     jwt_token = jwt.encode(
@@ -21,3 +23,14 @@ def decode(token):
         return result
     except jwt.ExpiredSignatureError:
         return None
+
+
+def set_payload(user):
+    payload = {
+        'id': user.id,
+        'nickname': user.username,
+        'email': user.email,
+        'exp': datetime.datetime.now() + datetime.timedelta(seconds=second_delta)
+    }
+
+    return payload

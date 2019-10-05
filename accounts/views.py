@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-import datetime
 
 # module for rest_framework
 from .serializers import UserSerializer
@@ -43,14 +42,7 @@ def login(request):
     user = authenticate(request, username=username, password=password)
 
     if user:
-
-        payload = {
-            'id': user.id,
-            'nickname': user.username,
-            'email': user.email,
-            'exp': datetime.datetime.now() + datetime.timedelta(seconds=100)
-        }
-        
+        payload = jwt_parser.set_payload(user)
         jwt_token = jwt_parser.encode(payload)
         
         return Response(jwt_token, status=status.HTTP_200_OK)
