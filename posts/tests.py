@@ -3,7 +3,7 @@ import requests
 
 # Create your tests here.
 
-class FunctionTest(TestCase):
+class PostTest(TestCase):
     def setUp(self):
         self.LOGIN_URL = "http://localhost:8000/accounts/signin/"
         self.login_data = {
@@ -24,6 +24,5 @@ class FunctionTest(TestCase):
     def test_post(self):
         result = requests.post(self.POST_URL, data=self.post_body)
 
-        print(result.status_code)
-        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.status_code, 201)
 
